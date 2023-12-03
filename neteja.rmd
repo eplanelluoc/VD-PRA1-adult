@@ -1,0 +1,66 @@
+---
+title: "VD-PRAC1-adult"
+author: "eplanelluoc"
+date: "2023-12-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Carreguem  les dades fem petit exàmen i eliminem 
+```{r}
+# Carrega del conjunt de dades
+adult <- read.csv("adult.csv")
+
+# Identificació i tractament de valors perduts
+summary(adult)  # Mostra un resum estadístic, identificant valors perduts
+```
+
+
+Si cal i te sentit en la visualització, omplim valors perduts amb la mitjana, exemple fet amb la variable age, es pot fer amb qualsevol númerica.
+```{r}
+# Omplir valors perduts amb la mitjana en variables numèriques
+adult$age[is.na(adult$age)] <- mean(adult$age, na.rm = TRUE)
+
+# Omplir valors perduts amb el valor més comú en variables categòriques
+adult$workclass[is.na(adult$workclass)] <- levels(adult$workclass)[which.max(table(adult$workclass))]
+
+```
+
+Si cal, neteja de valors buits
+```{r}
+# Identificació i tractament de valors buits
+adult[which(adult == "")] <- NA  # Converteix valors buits a NA
+
+# Eliminació de files amb valors buits
+adult <- na.omit(adult)
+
+```
+
+
+Si cal, neteja de valors ? i eliminar les files
+```{r}
+# Reemplaça "?" amb NA
+adult[adult == "?"] <- NA
+
+# Elimina files amb valors "?" en qualsevol columna
+adult <- adult[complete.cases(adult), ]
+
+```
+
+```{r}
+# Depenent de la visualització triarem una o altre visualització
+# Transformar una a una les variables categòriques individualment
+adult$education <- as.factor(adult$education)
+adult$marital_status <- as.factor(adult$marital.status)
+adult$occupation <- as.factor(adult$occupation)
+
+# Transforma automàticament totes les variables categòriques en que detectem caràcters. Usar amb precaució
+adult <- lapply(adult, function(x) if(is.character(x)) as.factor(x) else x)
+
+summary(adult)  
+head(adult)
+
+```
